@@ -102,13 +102,17 @@ tab1, tab2 = st.tabs(
     ["⚖️ Adli Para Cezası Hesaplama", "📅 Kamu Hizmeti Hesaplama"]
 )
 
+bugun_str = datetime.today().strftime("%d.%m.%Y")
+
 # --- MODÜL 1: Adli Para Cezası ---
 with tab1:
   st.subheader("Para Cezası & Saat Detayları")
   toplam_saat_input = st.text_input(
       "Toplam Ceza / Çalışma Saati:", placeholder="Örn: 40"
   )
-  baslama_tarihi = st.date_input("İnfaz Başlama Tarihi", value=datetime.today())
+  baslama_tarihi_str = st.text_input(
+      "İnfaz Başlama Tarihi (GG.AA.YYYY):", value=bugun_str
+  )
   gunluk_saat_combo = st.selectbox(
       "Günlük Çalışma Süresi:", ["2 Saat / Gün", "4 Saat / Gün", "8 Saat / Gün"], index=1
   )
@@ -120,6 +124,14 @@ with tab1:
         raise ValueError
     except ValueError:
       st.error("Lütfen geçerli bir saat miktarı girin!")
+      st.stop()
+
+    try:
+      baslama_tarihi = datetime.strptime(
+          baslama_tarihi_str.strip(), "%d.%m.%Y"
+      ).date()
+    except ValueError:
+      st.error("Lütfen tarihi GG.AA.YYYY formatında girin (Örn: 19.09.2026)")
       st.stop()
 
     if toplam_saat > 2190:
@@ -197,18 +209,27 @@ with tab1:
 # --- MODÜL 2: Kamu Hizmeti Hesaplama ---
 with tab2:
   st.subheader("📅 Tarih Bilgileri")
-  date_input1 = st.date_input("Başlama Tarihi", value=datetime.today(), key="d1")
-  date_input2 = st.date_input(
-      "Koşullu Salıverme Tarihi", value=datetime.today(), key="d2"
+  date_input1_str = st.text_input(
+      "Başlama Tarihi (GG.AA.YYYY):", value=bugun_str, key="d1"
   )
-  date_input3 = st.date_input(
-      "Kamu Hiz. Başlama Tarihi", value=datetime.today(), key="d3"
+  date_input2_str = st.text_input(
+      "Koşullu Salıverme Tarihi (GG.AA.YYYY):", value=bugun_str, key="d2"
+  )
+  date_input3_str = st.text_input(
+      "Kamu Hiz. Başlama Tarihi (GG.AA.YYYY):", value=bugun_str, key="d3"
   )
 
   if st.button("⚡ HESAPLA (Kamu Hizmeti)", use_container_width=True):
-    tarih1 = date_input1
-    tarih2 = date_input2
-    tarih3 = date_input3
+    try:
+      tarih1 = datetime.strptime(date_input1_str.strip(), "%d.%m.%Y").date()
+      tarih2 = datetime.strptime(date_input2_str.strip(), "%d.%m.%Y").date()
+      tarih3 = datetime.strptime(date_input3_str.strip(), "%d.%m.%Y").date()
+    except ValueError:
+      st.error(
+          "Lütfen tüm tarihleri GG.AA.YYYY formatında doğru girin (Örn:"
+          " 19.09.2026)"
+      )
+      st.stop()
 
     toplam_gun = (tarih2 - tarih1).days
     if toplam_gun < 0:
