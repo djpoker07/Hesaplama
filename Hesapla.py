@@ -111,8 +111,10 @@ with tab1:
       "Toplam Ceza / Çalışma Saati:", placeholder="Örn: 40"
   )
 
-  # Sağ tarafında ok simgesi olan yerleşik takvim kutusu
-  baslama_tarihi_obj = st.date_input("İnfaz Başlama Tarihi", value=bugun)
+  # Sağında ok simgesi olan, hem elle yazmaya hem takvimden seçmeye uygun alan
+  baslama_tarihi_obj = st.date_input(
+      "İnfaz Başlama Tarihi (GG.AA.YYYY)", value=bugun, format="DD.MM.YYYY"
+  )
 
   gunluk_saat_combo = st.selectbox(
       "Günlük Çalışma Süresi:", ["2 Saat / Gün", "4 Saat / Gün", "8 Saat / Gün"], index=1
@@ -205,9 +207,21 @@ with tab1:
 with tab2:
   st.subheader("📅 Tarih Bilgileri")
 
-  tarih1 = st.date_input("Başlama Tarihi", value=bugun, key="d1")
-  tarih2 = st.date_input("Koşullu Salıverme Tarihi", value=bugun, key="d2")
-  tarih3 = st.date_input("Kamu Hiz. Başlama Tarihi", value=bugun, key="d3")
+  tarih1 = st.date_input(
+      "Başlama Tarihi (GG.AA.YYYY)", value=bugun, format="DD.MM.YYYY", key="d1"
+  )
+  tarih2 = st.date_input(
+      "Koşullu Salıverme Tarihi (GG.AA.YYYY)",
+      value=bugun,
+      format="DD.MM.YYYY",
+      key="d2",
+  )
+  tarih3 = st.date_input(
+      "Kamu Hiz. Başlama Tarihi (GG.AA.YYYY)",
+      value=bugun,
+      format="DD.MM.YYYY",
+      key="d3",
+  )
 
   if st.button("⚡ HESAPLA (Kamu Hizmeti)", use_container_width=True):
     toplam_gun = (tarih2 - tarih1).days
