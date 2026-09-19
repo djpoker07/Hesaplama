@@ -100,21 +100,9 @@ st.markdown("---")
 # Sekmeler (Modüller Arası Geçiş)
 tab1, tab2 = st.tabs(
     ["⚖️ Adli Para Cezası Hesaplama", "📅 Kamu Hizmeti Hesaplama"]
-
 )
 
 bugun = datetime.today()
-
-# Session State içinde tarih kutularını takip etme
-if "tarih_basla_1" not in st.session_state:
-  st.session_state.tarih_basla_1 = bugun.strftime("%d.%m.%Y")
-if "tarih_kamu_1" not in st.session_state:
-  st.session_state.tarih_kamu_1 = bugun.strftime("%d.%m.%Y")
-if "tarih_kamu_2" not in st.session_state:
-  st.session_state.tarih_kamu_2 = bugun.strftime("%d.%m.%Y")
-if "tarih_kamu_3" not in st.session_state:
-  st.session_state.tarih_kamu_3 = bugun.strftime("%d.%m.%Y")
-
 
 # --- MODÜL 1: Adli Para Cezası ---
 with tab1:
@@ -123,23 +111,8 @@ with tab1:
       "Toplam Ceza / Çalışma Saati:", placeholder="Örn: 40"
   )
 
-  st.write("İnfaz Başlama Tarihi (GG.AA.YYYY):")
-  col1, col2 = st.columns([4, 1])
-  with col1:
-    baslama_tarihi_str = st.text_input(
-        "İnfaz Başlama Tarihi",
-        value=st.session_state.tarih_basla_1,
-        label_visibility="collapsed",
-        key="input_basla_1",
-    )
-  with col2:
-    with st.popover("📅 Takvim"):
-      secilen_d = st.date_input(
-          "Tarih Seç", value=bugun, key="picker_basla_1"
-      )
-      if secilen_d:
-        st.session_state.tarih_basla_1 = secilen_d.strftime("%d.%m.%Y")
-        st.rerun()
+  # Sağ tarafında ok simgesi olan yerleşik takvim kutusu
+  baslama_tarihi_obj = st.date_input("İnfaz Başlama Tarihi", value=bugun)
 
   gunluk_saat_combo = st.selectbox(
       "Günlük Çalışma Süresi:", ["2 Saat / Gün", "4 Saat / Gün", "8 Saat / Gün"], index=1
@@ -154,13 +127,7 @@ with tab1:
       st.error("Lütfen geçerli bir saat miktarı girin!")
       st.stop()
 
-    try:
-      baslama_tarihi = datetime.strptime(
-          baslama_tarihi_str.strip(), "%d.%m.%Y"
-      ).date()
-    except ValueError:
-      st.error("Lütfen tarihi GG.AA.YYYY formatında girin (Örn: 19.09.2026)")
-      st.stop()
+    baslama_tarihi = baslama_tarihi_obj
 
     if toplam_saat > 2190:
       toplam_saat = 2190.0
@@ -238,66 +205,11 @@ with tab1:
 with tab2:
   st.subheader("📅 Tarih Bilgileri")
 
-  st.write("Başlama Tarihi (GG.AA.YYYY):")
-  c1, c2 = st.columns([4, 1])
-  with c1:
-    date_input1_str = st.text_input(
-        "Başlama Tarihi",
-        value=st.session_state.tarih_kamu_1,
-        label_visibility="collapsed",
-        key="input_kamu_1",
-    )
-  with c2:
-    with st.popover("📅 Takvim"):
-      sd1 = st.date_input("Seç 1", value=bugun, key="p_kamu_1")
-      if sd1:
-        st.session_state.tarih_kamu_1 = sd1.strftime("%d.%m.%Y")
-        st.rerun()
-
-  st.write("Koşullu Salıverme Tarihi (GG.AA.YYYY):")
-  c3, c4 = st.columns([4, 1])
-  with c3:
-    date_input2_str = st.text_input(
-        "Koşullu Salıverme Tarihi",
-        value=st.session_state.tarih_kamu_2,
-        label_visibility="collapsed",
-        key="input_kamu_2",
-    )
-  with c4:
-    with st.popover("📅 Takvim"):
-      sd2 = st.date_input("Seç 2", value=bugun, key="p_kamu_2")
-      if sd2:
-        st.session_state.tarih_kamu_2 = sd2.strftime("%d.%m.%Y")
-        st.rerun()
-
-  st.write("Kamu Hiz. Başlama Tarihi (GG.AA.YYYY):")
-  c5, c6 = st.columns([4, 1])
-  with c5:
-    date_input3_str = st.text_input(
-        "Kamu Hiz. Başlama Tarihi",
-        value=st.session_state.tarih_kamu_3,
-        label_visibility="collapsed",
-        key="input_kamu_3",
-    )
-  with c6:
-    with st.popover("📅 Takvim"):
-      sd3 = st.date_input("Seç 3", value=bugun, key="p_kamu_3")
-      if sd3:
-        st.session_state.tarih_kamu_3 = sd3.strftime("%d.%m.%Y")
-        st.rerun()
+  tarih1 = st.date_input("Başlama Tarihi", value=bugun, key="d1")
+  tarih2 = st.date_input("Koşullu Salıverme Tarihi", value=bugun, key="d2")
+  tarih3 = st.date_input("Kamu Hiz. Başlama Tarihi", value=bugun, key="d3")
 
   if st.button("⚡ HESAPLA (Kamu Hizmeti)", use_container_width=True):
-    try:
-      tarih1 = datetime.strptime(date_input1_str.strip(), "%d.%m.%Y").date()
-      tarih2 = datetime.strptime(date_input2_str.strip(), "%d.%m.%Y").date()
-      tarih3 = datetime.strptime(date_input3_str.strip(), "%d.%m.%Y").date()
-    except ValueError:
-      st.error(
-          "Lütfen tüm tarihleri GG.AA.YYYY formatında doğru girin (Örn:"
-          " 19.09.2026)"
-      )
-      st.stop()
-
     toplam_gun = (tarih2 - tarih1).days
     if toplam_gun < 0:
       st.error("Koşullu salıverme tarihi, başlama tarihinden önce olamaz!")
