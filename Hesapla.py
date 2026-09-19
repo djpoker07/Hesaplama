@@ -100,9 +100,21 @@ st.markdown("---")
 # Sekmeler (Modüller Arası Geçiş)
 tab1, tab2 = st.tabs(
     ["⚖️ Adli Para Cezası Hesaplama", "📅 Kamu Hizmeti Hesaplama"]
+
 )
 
-bugun_str = datetime.today().strftime("%d.%m.%Y")
+bugun = datetime.today()
+
+# Session State içinde tarih kutularını takip etme
+if "tarih_basla_1" not in st.session_state:
+  st.session_state.tarih_basla_1 = bugun.strftime("%d.%m.%Y")
+if "tarih_kamu_1" not in st.session_state:
+  st.session_state.tarih_kamu_1 = bugun.strftime("%d.%m.%Y")
+if "tarih_kamu_2" not in st.session_state:
+  st.session_state.tarih_kamu_2 = bugun.strftime("%d.%m.%Y")
+if "tarih_kamu_3" not in st.session_state:
+  st.session_state.tarih_kamu_3 = bugun.strftime("%d.%m.%Y")
+
 
 # --- MODÜL 1: Adli Para Cezası ---
 with tab1:
@@ -110,9 +122,25 @@ with tab1:
   toplam_saat_input = st.text_input(
       "Toplam Ceza / Çalışma Saati:", placeholder="Örn: 40"
   )
-  baslama_tarihi_str = st.text_input(
-      "İnfaz Başlama Tarihi (GG.AA.YYYY):", value=bugun_str
-  )
+
+  st.write("İnfaz Başlama Tarihi (GG.AA.YYYY):")
+  col1, col2 = st.columns([4, 1])
+  with col1:
+    baslama_tarihi_str = st.text_input(
+        "İnfaz Başlama Tarihi",
+        value=st.session_state.tarih_basla_1,
+        label_visibility="collapsed",
+        key="input_basla_1",
+    )
+  with col2:
+    with st.popover("📅 Takvim"):
+      secilen_d = st.date_input(
+          "Tarih Seç", value=bugun, key="picker_basla_1"
+      )
+      if secilen_d:
+        st.session_state.tarih_basla_1 = secilen_d.strftime("%d.%m.%Y")
+        st.rerun()
+
   gunluk_saat_combo = st.selectbox(
       "Günlük Çalışma Süresi:", ["2 Saat / Gün", "4 Saat / Gün", "8 Saat / Gün"], index=1
   )
@@ -209,15 +237,54 @@ with tab1:
 # --- MODÜL 2: Kamu Hizmeti Hesaplama ---
 with tab2:
   st.subheader("📅 Tarih Bilgileri")
-  date_input1_str = st.text_input(
-      "Başlama Tarihi (GG.AA.YYYY):", value=bugun_str, key="d1"
-  )
-  date_input2_str = st.text_input(
-      "Koşullu Salıverme Tarihi (GG.AA.YYYY):", value=bugun_str, key="d2"
-  )
-  date_input3_str = st.text_input(
-      "Kamu Hiz. Başlama Tarihi (GG.AA.YYYY):", value=bugun_str, key="d3"
-  )
+
+  st.write("Başlama Tarihi (GG.AA.YYYY):")
+  c1, c2 = st.columns([4, 1])
+  with c1:
+    date_input1_str = st.text_input(
+        "Başlama Tarihi",
+        value=st.session_state.tarih_kamu_1,
+        label_visibility="collapsed",
+        key="input_kamu_1",
+    )
+  with c2:
+    with st.popover("📅 Takvim"):
+      sd1 = st.date_input("Seç 1", value=bugun, key="p_kamu_1")
+      if sd1:
+        st.session_state.tarih_kamu_1 = sd1.strftime("%d.%m.%Y")
+        st.rerun()
+
+  st.write("Koşullu Salıverme Tarihi (GG.AA.YYYY):")
+  c3, c4 = st.columns([4, 1])
+  with c3:
+    date_input2_str = st.text_input(
+        "Koşullu Salıverme Tarihi",
+        value=st.session_state.tarih_kamu_2,
+        label_visibility="collapsed",
+        key="input_kamu_2",
+    )
+  with c4:
+    with st.popover("📅 Takvim"):
+      sd2 = st.date_input("Seç 2", value=bugun, key="p_kamu_2")
+      if sd2:
+        st.session_state.tarih_kamu_2 = sd2.strftime("%d.%m.%Y")
+        st.rerun()
+
+  st.write("Kamu Hiz. Başlama Tarihi (GG.AA.YYYY):")
+  c5, c6 = st.columns([4, 1])
+  with c5:
+    date_input3_str = st.text_input(
+        "Kamu Hiz. Başlama Tarihi",
+        value=st.session_state.tarih_kamu_3,
+        label_visibility="collapsed",
+        key="input_kamu_3",
+    )
+  with c6:
+    with st.popover("📅 Takvim"):
+      sd3 = st.date_input("Seç 3", value=bugun, key="p_kamu_3")
+      if sd3:
+        st.session_state.tarih_kamu_3 = sd3.strftime("%d.%m.%Y")
+        st.rerun()
 
   if st.button("⚡ HESAPLA (Kamu Hizmeti)", use_container_width=True):
     try:
